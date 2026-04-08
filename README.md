@@ -25,22 +25,25 @@ NAT1 节点订阅系统
 ```bash
 git clone https://github.com/3090733781/nat1-sub-system.git
 cd nat1-sub-system
-
+```
 2. 创建虚拟环境并安装依赖
+```bash
 python3 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
-
+```
 3. 初始化配置
 首次运行会自动生成 config.json（包含随机 token）和默认节点配置。
 
-bash
+```bash
 python app.py
+```
 访问 http://你的服务器IP:9998/setup 设置管理员密码。
 
 4. 配置 systemd 服务（实现开机自启）
 创建服务文件 /etc/systemd/system/vmess-sub.service：
+```bash
 
 ini
 [Unit]
@@ -59,30 +62,33 @@ RestartSec=10
 WantedBy=multi-user.target
 启动并启用服务：
 
-bash
+```bash
 systemctl daemon-reload
 systemctl enable vmess-sub
 systemctl start vmess-sub
+```
 5. 开放防火墙端口
 云服务商安全组：放行 TCP 9998 端口
 
 系统防火墙（如有）：
 
-bash
+```bash
 # Ubuntu/Debian
 ufw allow 9998/tcp
 # CentOS
 firewall-cmd --permanent --add-port=9998/tcp && firewall-cmd --reload
+```
 路由器端配置（NATMap）
 登录管理后台，进入“生成路由器脚本”页面，复制对应节点的脚本到 OpenWrt 路由器，例如：
 
-bash
+```bash
 cat > /usr/bin/notify1.sh <<'EOF'
 #!/bin/sh
 curl -s "http://你的服务器IP:9998/setip?ip=$1"
 curl -s "http://你的服务器IP:9998/set1?p=$2"
 EOF
 chmod +x /usr/bin/notify1.sh
+```
 然后在 NATMap 实例中指定该脚本。每个节点需要单独的通知脚本。
 
 订阅地址
@@ -101,7 +107,7 @@ vmess 订阅：http://你的服务器IP:9998/sub?token=你的token
 /api/status/ports	GET	各节点端口
 配置文件说明
 config.json（自动生成，可手动修改）：
-
+```bash
 json
 {
   "port": 9998,
@@ -111,6 +117,7 @@ json
   "secret_key": "随机字符串",
   "sub_token": "随机订阅token"
 }
+```
 port：服务监听端口
 
 data_dir：动态数据目录（存放 current_ip.txt 和 port*.txt）
@@ -128,19 +135,18 @@ sub_token：订阅地址 token，可自行修改
 登录管理后台，点击“+ 添加节点”，填写名称、UUID 等信息。保存后，在路由器上为新节点创建对应的通知脚本（NATMap 实例）。
 
 4. 更新代码
-bash
+```bash
 cd /root/nat1-sub-system
 git pull
 systemctl restart vmess-sub
+```
 开发与扩展
 插件位于 plugins/ 目录，实现 register(app) 即可自动加载。
 
 可自行添加对 trojan、ss 等协议的支持。
 
-许可证
-MIT License
 
-text
+
 
 将此文件保存为 `README.md` 并推送到仓库：
 
@@ -149,3 +155,4 @@ cd /www/wwwroot/sub
 git add README.md
 git commit -m "Add README (Python only, vmess only)"
 git push
+```
