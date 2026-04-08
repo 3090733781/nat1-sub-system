@@ -1,0 +1,17 @@
+# 运行时数据（本地保留，不推送）
+config.json
+password.hash
+nodes.json
+sub/
+
+# Python 缓存
+__pycache__/
+*.pyc
+plugins/__pycache__/
+templates/__pycache__/
+
+# 环境变量
+.env
+
+# 日志
+*.log
